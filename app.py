@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO, emit
 import google.generativeai as genai
@@ -24,7 +27,6 @@ try:
     if not api_key:
         raise ValueError("환경 변수에서 GEMINI_API_KEY를 찾을 수 없습니다.")
     genai.configure(api_key=api_key)
-    
     model = genai.GenerativeModel('gemini-2.5-flash-preview-04-17')
     app.logger.info("Gemini 모델이 성공적으로 로드되었습니다.")
 except Exception as e:
@@ -202,7 +204,9 @@ def add_guestbook_entry():
         return jsonify({"error": "데이터베이스 연결 실패."}), 500
 
 if __name__ == '__main__':
-    initialize_database()
+    with app.app_context():
+         initialize_database()
+
     port = int(os.environ.get('PORT', 5000))
-    app.logger.info(f"SocketIO 서버를 {port} 포트에서 시작합니다.")
+    app.logger.info(f"SocketIO 서버를 {port} 포트에서 시작합니다. (eventlet)")
     socketio.run(app, host='0.0.0.0', port=port, debug=False)
