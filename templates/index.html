@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>END-chat-bot & Guestbook</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { /* ... 이전 스타일 유지 ... */ }
+        ::-webkit-scrollbar { /* ... 이전 스타일 유지 ... */ }
+        #chatArea { /* ... 이전 스타일 유지 ... */ }
+        .message-bubble { /* ... 이전 스타일 유지 ... */ }
+        .user-message { /* ... 이전 스타일 유지 ... */ }
+        .assistant-message { /* ... 이전 스타일 유지 ... */ }
+        #inputArea { /* ... 이전 스타일 유지 ... */ }
+        #messageInput { /* ... 이전 스타일 유지 ... */ }
+        button#askButton { /* ... 이전 스타일 유지 ... */ }
+        button:disabled { /* ... 이전 스타일 유지 ... */ }
+        #thinkingIndicator { /* ... 이전 스타일 유지 ... */ }
+        #timer { /* ... 이전 스타일 유지 ... */ }
+        #errorArea { /* ... 이전 스타일 유지 ... */ }
+
+        /* --- Guestbook Styles --- */
+        .guestbook-container {
+            /* Example height, adjust as needed */
+            /* Match chat area height or set independently */
+            height: 75vh;
+            max-height: 75vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #guestbookEntries {
+            flex-grow: 1; /* Take available space */
+            overflow-y: auto;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .guestbook-entry {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .guestbook-entry .name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-right: 0.5rem;
+        }
+        .guestbook-entry .timestamp {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        .guestbook-entry .message {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #374151;
+            line-height: 1.6;
+            white-space: pre-wrap; /* Preserve line breaks */
+            word-wrap: break-word;
+        }
+        #guestbookForm {
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        #guestbookForm input,
+        #guestbookForm textarea {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem; /* rounded-md */
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+         #guestbookForm input:focus,
+         #guestbookForm textarea:focus {
+             outline: none;
+             border-color: #3b82f6; /* focus:border-blue-500 */
+             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+         }
+         #guestbookForm textarea {
+            resize: vertical; /* Allow vertical resize */
+            min-height: 60px;
+         }
+         #guestbookForm button {
+            width: 100%;
+            background-color: #3b82f6; /* bg-blue-500 */
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s;
+         }
+         #guestbookForm button:hover {
+            background-color: #2563eb; /* hover:bg-blue-600 */
+         }
+         #guestbookForm button:disabled {
+             background-color: #d1d5db;
+             cursor: not-allowed;
+             opacity: 0.7;
+         }
+         #guestbookError {
+            color: #dc2626;
+            font-size: 0.75rem;
+            font-weight: 500;
+            height: 1.25rem;
+            margin-top: 0.5rem;
+            text-align: center;
+         }
+         /* --- End Guestbook Styles --- */
+
+        #notepadTextarea { /* ... 이전 스타일 유지 ... */ }
+        #notepadTextarea:focus { /* ... 이전 스타일 유지 ... */ }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 md:p-6 bg-gray-100">
+    <div class="flex flex-col md:flex-row gap-6 w-full max-w-7xl mx-auto"> <!-- Increased max-width -->
+
+        <!-- Chat Section (md:w-1/2 or adjust as needed) -->
+        <div class="bg-white rounded-2xl shadow-sm w-full md:w-[45%] border border-gray-200/75 flex flex-col overflow-hidden guestbook-container"> <!-- Apply container height -->
+            <!-- Header -->
+            <div class="text-center p-6 border-b border-gray-200/90 flex-shrink-0">
+                 <!-- ... header content ... -->
+                 <h1 class="text-xl md:text-2xl font-semibold text-gray-800">정보의 궁전</h1>
+            </div>
+            <!-- Chat Messages Area -->
+            <div id="chatArea" class="flex-grow">
+                 <div class="message-bubble assistant-message">안녕하세요 무엇을 도와드릴까요?</div>
+            </div>
+            <!-- Thinking Indicator -->
+            <div id="thinkingIndicator" class="flex-shrink-0">
+                 <span>생각 중... </span><span id="timer">(0.0s)</span>
+            </div>
+            <!-- Error Area -->
+            <div id="errorArea" class="flex-shrink-0"></div>
+            <!-- Input Area -->
+            <div id="inputArea" class="flex items-end gap-2 border-t border-gray-200/90 flex-shrink-0">
+                 <textarea id="messageInput" rows="1" class="flex-grow..." placeholder="메시지를 입력하세요..."></textarea>
+                 <button id="askButton" class="inline-flex...">
+                    <svg><!-- ... icon ... --></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Guestbook Section (md:w-1/3 or adjust) -->
+        <div class="bg-white rounded-2xl shadow-sm w-full md:w-[30%] border border-gray-200/75 flex flex-col guestbook-container"> <!-- Apply container height -->
+            <!-- Guestbook Header -->
+            <h3 class="text-lg font-semibold text-gray-700 p-4 border-b text-center flex-shrink-0">방명록</h3>
+            <!-- Guestbook Entries -->
+            <div id="guestbookEntries">
+                <!-- Entries will be loaded here by Jinja2 initially, and updated by JS -->
+                {% if guestbook_entries %}
+                    {% for entry in guestbook_entries %}
+                    <div class="guestbook-entry">
+                        <div>
+                            <span class="name">{{ entry.name }}</span>
+                            <span class="timestamp">{{ entry.timestamp }}</span>
+                        </div>
+                        <div class="message">{{ entry.message }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center text-gray-500 py-4">아직 등록된 방명록이 없습니다.</p>
+                {% endif %}
+            </div>
+            <!-- Guestbook Form -->
+            <div id="guestbookForm" class="flex-shrink-0">
+                <input type="text" id="guestbookName" placeholder="이름 (최대 20자)" maxlength="20" required>
+                <textarea id="guestbookMessage" rows="3" placeholder="메시지를 남겨주세요 (최대 500자)" maxlength="500" required></textarea>
+                <button id="addEntryButton">등록</button>
+                <div id="guestbookError"></div> <!-- Area for guestbook submission errors -->
+            </div>
+        </div>
+
+        <!-- Notepad Section (md:w-1/4 or adjust) -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm w-full md:w-[25%] border border-gray-200/75 flex flex-col guestbook-container md:sticky md:top-6"> <!-- Apply container height -->
+             <h3 class="text-sm font-medium text-gray-600 mb-3 flex items-center uppercase tracking-wider flex-shrink-0">
+                 <svg><!-- ... icon ... --></svg> 메모장
+            </h3>
+            <textarea id="notepadTextarea" class="w-full h-full bg-transparent focus:outline-none focus:ring-0 p-1 flex-grow" placeholder="여기에 간단한 메모를 작성하세요...저장X"></textarea>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Chatbot DOM Elements & Variables (previous code) ---
+        const chatArea = document.getElementById('chatArea');
+        const messageInput = document.getElementById('messageInput');
+        const askButton = document.getElementById('askButton');
+        const thinkingIndicator = document.getElementById('thinkingIndicator');
+        const timerElement = document.getElementById('timer');
+        const errorArea = document.getElementById('errorArea');
+        let conversationHistory = [];
+        const MAX_HISTORY_MESSAGES = 20;
+        let timerInterval = null;
+        let startTime = null;
+
+        // --- Guestbook DOM Elements ---
+        const guestbookEntriesDiv = document.getElementById('guestbookEntries');
+        const guestbookNameInput = document.getElementById('guestbookName');
+        const guestbookMessageInput = document.getElementById('guestbookMessage');
+        const addEntryButton = document.getElementById('addEntryButton');
+        const guestbookErrorDiv = document.getElementById('guestbookError');
+
+        // --- Chatbot Helper Functions (previous code) ---
+        function appendMessageToUI(role, content) { /* ... 이전 코드 유지 ... */ }
+        function autoResizeTextarea() { /* ... 이전 코드 유지 ... */ }
+        async function sendMessage() { /* ... 이전 코드 유지 ... */ }
+
+        // --- Guestbook Functions ---
+        function displayGuestbookEntries(entries) {
+            guestbookEntriesDiv.innerHTML = ''; // Clear current entries
+            if (!entries || entries.length === 0) {
+                guestbookEntriesDiv.innerHTML = '<p class="text-center text-gray-500 py-4">아직 등록된 방명록이 없습니다.</p>';
+                return;
+            }
+
+            // 최신 글이 위로 오도록 배열 순서를 맞춥니다 (백엔드에서 이미 reverse 했다면 필요 없을 수 있음)
+            // entries.reverse(); // 필요에 따라 주석 해제
+
+            entries.forEach(entry => {
+                const entryDiv = document.createElement('div');
+                entryDiv.classList.add('guestbook-entry');
+
+                // Sanitize user input before inserting as HTML (basic example)
+                const safeName = entry.name.replace(/</g, "<").replace(/>/g, ">");
+                const safeMessage = entry.message.replace(/</g, "<").replace(/>/g, ">");
+                const safeTimestamp = entry.timestamp; // Assuming timestamp is safe
+
+                entryDiv.innerHTML = `
+                    <div>
+                        <span class="name">${safeName}</span>
+                        <span class="timestamp">${safeTimestamp}</span>
+                    </div>
+                    <div class="message">${safeMessage.replace(/\n/g, '<br>')}</div>
+                `; // Render line breaks in messages
+                guestbookEntriesDiv.appendChild(entryDiv);
+            });
+             // Scroll to top after loading/refreshing
+             guestbookEntriesDiv.scrollTop = 0;
+        }
+
+        async function fetchAndDisplayGuestbook() {
+            try {
+                const response = await fetch('/guestbook');
+                if (!response.ok) {
+                    throw new Error(`방명록 로딩 실패 (${response.status})`);
+                }
+                const entries = await response.json();
+                displayGuestbookEntries(entries);
+            } catch (error) {
+                console.error("방명록 로딩 오류:", error);
+                guestbookErrorDiv.textContent = "방명록을 불러오는 중 오류가 발생했습니다.";
+            }
+        }
+
+        async function addGuestbookEntry() {
+            const name = guestbookNameInput.value.trim();
+            const message = guestbookMessageInput.value.trim();
+            guestbookErrorDiv.textContent = ''; // Clear previous errors
+
+            if (!name || !message) {
+                guestbookErrorDiv.textContent = '이름과 메시지를 모두 입력해주세요.';
+                return;
+            }
+
+            addEntryButton.disabled = true;
+            guestbookNameInput.disabled = true;
+            guestbookMessageInput.disabled = true;
+
+            try {
+                const response = await fetch('/guestbook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: name, message: message }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || `등록 실패 (${response.status})`);
+                }
+
+                // Success
+                guestbookNameInput.value = '';
+                guestbookMessageInput.value = '';
+                // Refresh the guestbook list to show the new entry
+                await fetchAndDisplayGuestbook();
+
+            } catch (error) {
+                console.error("방명록 등록 오류:", error);
+                guestbookErrorDiv.textContent = error.message || "방명록 등록 중 오류 발생";
+            } finally {
+                addEntryButton.disabled = false;
+                guestbookNameInput.disabled = false;
+                guestbookMessageInput.disabled = false;
+            }
+        }
+
+        // --- Event Listeners ---
+        // Chatbot listeners (previous code)
+        askButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('input', autoResizeTextarea);
+        messageInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); sendMessage();
+            }
+        });
+
+        // Guestbook listener
+        addEntryButton.addEventListener('click', addGuestbookEntry);
+        // Optional: Allow Enter in guestbook message textarea? Maybe not, use button.
+
+        // --- Initial Setup ---
+        messageInput.focus(); // Initial focus on chat input
+        autoResizeTextarea();
+        // Initial guestbook load is handled by server-side rendering (Jinja2)
+        // If you prefer full JS loading, uncomment the next line and remove Jinja2 loop in HTML:
+        // document.addEventListener('DOMContentLoaded', fetchAndDisplayGuestbook);
+
+    </script>
+</body>
+</html>
