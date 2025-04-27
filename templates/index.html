@@ -15,33 +15,33 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cccccc; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #aaaaaa; }
-        #chatArea { max-height: calc(75vh - 150px); overflow-y: auto; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
+        .section-container { background-color: white; border-radius: 1rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e5e7eb; display: flex; flex-direction: column; overflow: hidden; height: auto; }
+        #chatArea { flex-grow: 1; overflow-y: auto; padding: 1rem; border-bottom: 1px solid #e5e7eb; max-height: 60vh; md:max-height: none; }
         .message-bubble { padding: 0.6rem 0.9rem; border-radius: 1rem; margin-bottom: 0.75rem; max-width: 85%; line-height: 1.6; word-wrap: break-word; font-size: 0.875rem; clear: both; }
         .user-message { background-color: #dbeafe; color: #1e40af; float: right; margin-left: auto; text-align: left; }
         .assistant-message { background-color: #e5e7eb; color: #374151; float: left; margin-right: auto; }
-        #inputArea { padding: 0.75rem 1rem; }
+        #inputArea { padding: 0.75rem 1rem; border-top: 1px solid #e5e7eb; flex-shrink: 0; }
         #messageInput { resize: none; overflow-y: hidden; transition: height 0.2s ease; flex-grow: 1; width: 100%; padding: 0.6rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); font-size: 0.875rem; color: #1f2937; background-color: #f9fafb; }
         #messageInput::placeholder { color: #9ca3af; }
         #messageInput:focus { outline: none; box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.4); border-color: #60a5fa; }
         button#askButton { padding-top: 0.5rem; padding-bottom: 0.5rem; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background-color: #4f46e5; hover:background-color: #4338ca; color: white; font-weight: 500; font-size: 0.875rem; padding: 0.5rem 1rem; border-radius: 0.5rem; focus:outline-none; transition: background-color 0.2s; }
         button:disabled { background-color: #d1d5db; cursor: not-allowed; opacity: 0.7; }
-        #thinkingIndicator { display: none; text-align: center; padding: 0.5rem 0; color: #6b7280; font-size: 0.875rem; border-top: 1px solid #e5e7eb; }
+        #thinkingIndicator { display: none; text-align: center; padding: 0.5rem 0; color: #6b7280; font-size: 0.875rem; border-top: 1px solid #e5e7eb; flex-shrink: 0; }
         #timer { font-weight: 500; font-variant-numeric: tabular-nums; }
-        #errorArea { text-align: center; color: #dc2626; font-size: 0.75rem; font-weight: 500; height: 1.25rem; padding: 0 1rem; }
-        .guestbook-container { height: 75vh; max-height: 75vh; display: flex; flex-direction: column; }
-        #guestbookEntries { flex-grow: 1; overflow-y: auto; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
+        #errorArea { text-align: center; color: #dc2626; font-size: 0.75rem; font-weight: 500; height: 1.25rem; padding: 0 1rem; flex-shrink: 0; }
+        #guestbookEntries { flex-grow: 1; overflow-y: auto; padding: 1rem; border-bottom: 1px solid #e5e7eb; max-height: 55vh; md:max-height: none; }
         .guestbook-entry { background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 0.75rem 1rem; border-radius: 0.5rem; margin-bottom: 0.75rem; }
         .guestbook-entry .name { font-weight: 600; color: #1f2937; margin-right: 0.5rem; }
         .guestbook-entry .timestamp { font-size: 0.75rem; color: #6b7280; }
         .guestbook-entry .message { margin-top: 0.5rem; font-size: 0.875rem; color: #374151; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
-        #guestbookForm { padding: 1rem; border-top: 1px solid #e5e7eb; }
+        #guestbookForm { padding: 1rem; border-top: 1px solid #e5e7eb; flex-shrink: 0; }
         #guestbookForm input, #guestbookForm textarea { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; margin-bottom: 0.75rem; font-size: 0.875rem; box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
         #guestbookForm input:focus, #guestbookForm textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
         #guestbookForm textarea { resize: vertical; min-height: 60px; }
         #guestbookForm button { width: 100%; background-color: #3b82f6; color: white; font-weight: 500; padding: 0.5rem 1rem; border-radius: 0.375rem; transition: background-color 0.2s; }
         #guestbookForm button:hover { background-color: #2563eb; }
         #guestbookError { color: #dc2626; font-size: 0.75rem; font-weight: 500; height: 1.25rem; margin-top: 0.5rem; text-align: center; }
-        #notepadTextarea { flex-grow: 1; border: none; outline: none; box-shadow: none; resize: none; background-color: transparent; font-size: 0.875rem; line-height: 1.6; color: #4b5563; padding: 0.25rem; }
+        #notepadTextarea { flex-grow: 1; border: none; outline: none; box-shadow: none; resize: none; background-color: transparent; font-size: 0.875rem; line-height: 1.6; color: #4b5563; padding: 0.25rem; min-height: 150px; }
         #notepadTextarea:focus { box-shadow: none; }
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -52,22 +52,22 @@
 <body class="flex items-center justify-center min-h-screen p-4 md:p-6 bg-gray-100">
     <div class="flex flex-col md:flex-row gap-6 w-full max-w-7xl mx-auto">
 
-        <div class="bg-white rounded-2xl shadow-sm w-full md:w-[45%] border border-gray-200/75 flex flex-col overflow-hidden guestbook-container">
+        <div class="section-container w-full md:w-[45%] h-auto md:h-[75vh]">
              <div class="text-center p-6 border-b border-gray-200/90 flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-indigo-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
                   <h1 class="text-xl md:text-2xl font-semibold text-gray-800">정보의 궁전</h1>
                   <p class="text-xs text-gray-500 mt-1">궁금한 것을 물어보시옵소서.</p>
              </div>
-             <div id="chatArea" class="flex-grow"><div class="message-bubble assistant-message">반갑사옵니다. 무엇이 궁금하신지요?</div></div>
-             <div id="thinkingIndicator" class="flex-shrink-0"><span>답변을 생각하고 있사옵니다... </span><span id="timer">(0.0s)</span></div>
+             <div id="chatArea"> <div class="message-bubble assistant-message">반갑사옵니다. 무엇이 궁금하신지요?</div> </div>
+             <div id="thinkingIndicator" class="flex-shrink-0"> <span>답변을 생각하고 있사옵니다... </span><span id="timer">(0.0s)</span> </div>
              <div id="errorArea" class="flex-shrink-0"></div>
-             <div id="inputArea" class="flex items-end gap-2 border-t border-gray-200/90 flex-shrink-0 p-2">
-                  <textarea id="messageInput" rows="1" class="flex-grow w-full" placeholder="여기에 여쭐 말씀을 적으시옵소서..."></textarea>
+             <div id="inputArea" class="flex items-end gap-2 p-2">
+                  <textarea id="messageInput" rows="1" class="flex-grow" placeholder="여기에 여쭐 말씀을 적으시옵소서..."></textarea>
                   <button id="askButton"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg></button>
              </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm w-full md:w-[30%] border border-gray-200/75 flex flex-col guestbook-container">
+        <div class="section-container w-full md:w-[30%] h-auto md:h-[75vh]">
             <h3 class="text-lg font-semibold text-gray-700 p-4 border-b text-center flex-shrink-0">방명록</h3>
             <div id="guestbookEntries">
                 {% if guestbook_entries %}
@@ -89,7 +89,7 @@
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm w-full md:w-[25%] border border-gray-200/75 flex flex-col guestbook-container md:sticky md:top-6">
+        <div class="section-container w-full md:w-[25%] h-auto md:h-[75vh] md:sticky md:top-6 p-6">
              <h3 class="text-sm font-medium text-gray-600 mb-3 flex items-center uppercase tracking-wider flex-shrink-0">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> 메모장
              </h3>
@@ -109,7 +109,6 @@
         const guestbookMessageInput = document.getElementById('guestbookMessage');
         const addEntryButton = document.getElementById('addEntryButton');
         const guestbookErrorDiv = document.getElementById('guestbookError');
-        const noEntriesMessage = document.getElementById('noEntriesMessage');
 
         let conversationHistory = [];
         const MAX_HISTORY_MESSAGES = 20;
@@ -144,8 +143,8 @@
                      messageDiv.style.border = '1px solid #fecaca';
                 }
             }
-            chatArea.appendChild(messageDiv);
-            chatArea.scrollTop = chatArea.scrollHeight;
+            if(chatArea) chatArea.appendChild(messageDiv);
+            if(chatArea) chatArea.scrollTop = chatArea.scrollHeight;
         }
 
         function autoResizeTextarea() {
@@ -159,8 +158,8 @@
         async function sendMessage() {
             if (!messageInput || !askButton) { console.error("채팅 요소 미발견"); return; }
             const messageText = messageInput.value.trim();
-            errorArea.textContent = '';
-            thinkingIndicator.style.display = 'none';
+            if(errorArea) errorArea.textContent = '';
+            if(thinkingIndicator) thinkingIndicator.style.display = 'none';
             if (timerInterval) clearInterval(timerInterval);
             if (!messageText) { messageInput.focus(); return; }
 
@@ -173,11 +172,12 @@
 
             askButton.disabled = true; messageInput.disabled = true;
             askButton.querySelector('svg')?.classList.add('animate-spin');
-            thinkingIndicator.style.display = 'block';
-            startTime = Date.now(); timerElement.textContent = '(0.0s)';
+            if(thinkingIndicator) thinkingIndicator.style.display = 'block';
+            startTime = Date.now();
+            if(timerElement) timerElement.textContent = '(0.0s)';
             timerInterval = setInterval(() => {
                 const elapsedSeconds = ((Date.now() - startTime) / 1000).toFixed(1);
-                timerElement.textContent = `(${elapsedSeconds}s)`;
+                if(timerElement) timerElement.textContent = `(${elapsedSeconds}s)`;
             }, 100);
 
             try {
@@ -194,17 +194,20 @@
                 console.error('오류 발생:', error);
                 const errorMsg = `⚠️ ${error.message || '알 수 없는 오류 발생'}`;
                 appendMessageToUI('assistant', errorMsg);
-                errorArea.textContent = error.message || '알 수 없는 오류가 발생했습니다.';
+                if(errorArea) errorArea.textContent = error.message || '알 수 없는 오류가 발생했습니다.';
             } finally {
                 askButton.disabled = false; messageInput.disabled = false;
                 askButton.querySelector('svg')?.classList.remove('animate-spin');
-                thinkingIndicator.style.display = 'none'; messageInput.focus();
+                if(thinkingIndicator) thinkingIndicator.style.display = 'none';
+                if(messageInput) messageInput.focus();
             }
         }
 
         function prependGuestbookEntry(entry) {
              const currentNoEntriesMsg = document.getElementById('noEntriesMessage');
              if (currentNoEntriesMsg) { currentNoEntriesMsg.remove(); }
+             if (!guestbookEntriesDiv) return;
+
             const entryDiv = document.createElement('div');
             entryDiv.classList.add('guestbook-entry', 'new-entry');
             const safeName = entry.name.replace(/</g, "<").replace(/>/g, ">");
@@ -279,7 +282,6 @@
                  });
             }
         });
-
     </script>
 </body>
 </html>
