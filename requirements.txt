@@ -2,3 +2,6 @@ Flask
 google-generativeai
 pytz
 gunicorn
+Flask-SocketIO
+eventlet
+psycopg2-binary
