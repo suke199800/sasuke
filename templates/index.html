@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>정보의 궁전 & 방명록</title> <!-- 타이틀 수정 -->
+    <title>정보의 궁전 & 방명록</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +11,7 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Inter', 'Noto Sans KR';
-            background-color: #f5f5f7; /* 밝은 회색 배경 */
+            background-color: #f5f5f7;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -20,118 +20,54 @@
         ::-webkit-scrollbar-thumb { background: #cccccc; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #aaaaaa; }
 
-        /* --- Chat Area Styles --- */
-        #chatArea {
-            max-height: calc(75vh - 150px); /* 높이 조정 필요시 */
-            overflow-y: auto;
-            padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .message-bubble {
-            padding: 0.6rem 0.9rem; border-radius: 1rem; margin-bottom: 0.75rem;
-            max-width: 85%; line-height: 1.6; word-wrap: break-word;
-            font-size: 0.875rem; clear: both;
-        }
-        .user-message {
-            background-color: #dbeafe; color: #1e40af; float: right;
-            margin-left: auto; text-align: left;
-        }
-        .assistant-message {
-            background-color: #e5e7eb; color: #374151; float: left;
-            margin-right: auto;
-        }
-        /* --- End Chat Area Styles --- */
+        #chatArea { max-height: calc(75vh - 150px); overflow-y: auto; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
+        .message-bubble { padding: 0.6rem 0.9rem; border-radius: 1rem; margin-bottom: 0.75rem; max-width: 85%; line-height: 1.6; word-wrap: break-word; font-size: 0.875rem; clear: both; }
+        .user-message { background-color: #dbeafe; color: #1e40af; float: right; margin-left: auto; text-align: left; }
+        .assistant-message { background-color: #e5e7eb; color: #374151; float: left; margin-right: auto; }
 
-        /* --- Input Area Styles --- */
         #inputArea { padding: 0.75rem 1rem; }
         #messageInput {
-            resize: none; overflow-y: hidden; transition: height 0.2s ease;
-            /* Input 스타일링 - 이전 코드 참조 */
-            flex-grow: 1; w-full: ; px-3: ; py-2: ; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-            placeholder-gray-400: ; text-sm: ; text-gray-800: ; bg-gray-50/80: ;
+            resize: none; overflow-y: hidden; transition: height 0.2s ease; flex-grow: 1; width: 100%; padding: 0.6rem 0.75rem; /* Adjusted padding slightly */
+            border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+            font-size: 0.875rem; color: #1f2937; background-color: #f9fafb; /* Slightly adjusted input colors */
         }
-        #messageInput:focus {
-             outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); border-color: #3b82f6;
-        }
+        #messageInput::placeholder { color: #9ca3af; } /* Placeholder color */
+        #messageInput:focus { outline: none; box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.4); border-color: #60a5fa; } /* Adjusted focus ring */
         button#askButton {
-            padding-top: 0.5rem; padding-bottom: 0.5rem; flex-shrink: 0;
-            /* Button 스타일링 - 이전 코드 참조 */
-            inline-flex: ; items-center: ; justify-center: ; bg-[#007aff]: ; hover:bg-[#005ecb]: ; text-white: ; font-medium: ; text-sm: ; py-2: ; px-4: ; rounded-lg: ; focus:outline-none: ; transition: ;
-        }
-        button:disabled {
-            background-color: #d1d5db; cursor: not-allowed; opacity: 0.7;
-        }
-        /* --- End Input Area Styles --- */
+             padding-top: 0.5rem; padding-bottom: 0.5rem; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+             background-color: #4f46e5; /* Indigo */ hover:background-color: #4338ca; color: white; font-weight: 500; text-sm: ; padding: 0.5rem 1rem; /* Adjusted padding */
+             border-radius: 0.5rem; /* Matched input border-radius */ focus:outline-none; transition: background-color 0.2s;
+         }
+        button:disabled { background-color: #d1d5db; cursor: not-allowed; opacity: 0.7; }
 
-        #thinkingIndicator {
-            display: none; text-align: center; padding: 0.5rem 0;
-            color: #6b7280; font-size: 0.875rem; border-top: 1px solid #e5e7eb;
-        }
+        #thinkingIndicator { display: none; text-align: center; padding: 0.5rem 0; color: #6b7280; font-size: 0.875rem; border-top: 1px solid #e5e7eb; }
         #timer { font-weight: 500; font-variant-numeric: tabular-nums; }
-        #errorArea {
-            text-align: center; color: #dc2626; font-size: 0.75rem;
-            font-weight: 500; height: 1.25rem; padding: 0 1rem;
-        }
+        #errorArea { text-align: center; color: #dc2626; font-size: 0.75rem; font-weight: 500; height: 1.25rem; padding: 0 1rem; }
 
-        /* --- Guestbook Styles --- */
-        .guestbook-container {
-            height: 75vh; max-height: 75vh; display: flex; flex-direction: column;
-            /* background-color: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; */
-        }
-        #guestbookEntries {
-            flex-grow: 1; overflow-y: auto; padding: 1rem; border-bottom: 1px solid #e5e7eb;
-        }
-        .guestbook-entry {
-            background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 0.75rem 1rem;
-            border-radius: 0.5rem; margin-bottom: 0.75rem;
-        }
+        .guestbook-container { height: 75vh; max-height: 75vh; display: flex; flex-direction: column; }
+        #guestbookEntries { flex-grow: 1; overflow-y: auto; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
+        .guestbook-entry { background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 0.75rem 1rem; border-radius: 0.5rem; margin-bottom: 0.75rem; }
         .guestbook-entry .name { font-weight: 600; color: #1f2937; margin-right: 0.5rem; }
         .guestbook-entry .timestamp { font-size: 0.75rem; color: #6b7280; }
-        .guestbook-entry .message {
-            margin-top: 0.5rem; font-size: 0.875rem; color: #374151;
-            line-height: 1.6; white-space: pre-wrap; word-wrap: break-word;
-        }
+        .guestbook-entry .message { margin-top: 0.5rem; font-size: 0.875rem; color: #374151; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
         #guestbookForm { padding: 1rem; border-top: 1px solid #e5e7eb; }
-        #guestbookForm input,
-        #guestbookForm textarea {
-            width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db;
-            border-radius: 0.375rem; margin-bottom: 0.75rem; font-size: 0.875rem;
+        #guestbookForm input, #guestbookForm textarea {
+            width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; margin-bottom: 0.75rem; font-size: 0.875rem;
             box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
-         #guestbookForm input:focus,
-         #guestbookForm textarea:focus {
-             outline: none; border-color: #3b82f6;
-             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-         }
+         #guestbookForm input:focus, #guestbookForm textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
          #guestbookForm textarea { resize: vertical; min-height: 60px; }
          #guestbookForm button {
-            width: 100%; background-color: #3b82f6; color: white;
-            font-weight: 500; padding: 0.5rem 1rem; border-radius: 0.375rem;
-            transition: background-color 0.2s;
+            width: 100%; background-color: #3b82f6; color: white; font-weight: 500; padding: 0.5rem 1rem; border-radius: 0.375rem; transition: background-color 0.2s;
          }
          #guestbookForm button:hover { background-color: #2563eb; }
-         #guestbookForm button:disabled { /* 스타일 위 정의됨 */ }
-         #guestbookError {
-            color: #dc2626; font-size: 0.75rem; font-weight: 500;
-            height: 1.25rem; margin-top: 0.5rem; text-align: center;
-         }
-         /* --- End Guestbook Styles --- */
+         #guestbookError { color: #dc2626; font-size: 0.75rem; font-weight: 500; height: 1.25rem; margin-top: 0.5rem; text-align: center; }
 
-        #notepadTextarea {
-            flex-grow: 1; border: none; outline: none; box-shadow: none; resize: none;
-            background-color: transparent; font-size: 0.875rem;
-             line-height: 1.6; color: #4b5563; padding: 0.25rem;
-        }
-         #notepadTextarea:focus { box-shadow: none; }
+        #notepadTextarea { flex-grow: 1; border: none; outline: none; box-shadow: none; resize: none; background-color: transparent; font-size: 0.875rem; line-height: 1.6; color: #4b5563; padding: 0.25rem; }
+        #notepadTextarea:focus { box-shadow: none; }
 
-        /* Add class for spinning animation */
-        .animate-spin {
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 md:p-6 bg-gray-100">
@@ -147,7 +83,6 @@
                  <p class="text-xs text-gray-500 mt-1">궁금한 것을 물어보시옵소서.</p>
             </div>
             <div id="chatArea" class="flex-grow">
-                 <!-- 초기 메시지: 백엔드 응답에 따라 수정될 수 있음 -->
                  <div class="message-bubble assistant-message">반갑사옵니다. 무엇이 궁금하신지요?</div>
             </div>
             <div id="thinkingIndicator" class="flex-shrink-0">
@@ -155,8 +90,8 @@
             </div>
             <div id="errorArea" class="flex-shrink-0"></div>
             <div id="inputArea" class="flex items-end gap-2 border-t border-gray-200/90 flex-shrink-0 p-2">
-                 <textarea id="messageInput" rows="1" class="flex-grow w-full px-3 py-2 border border-gray-300/80 rounded-lg shadow-sm focus:border-blue-500 transition duration-150 ease-in-out placeholder-gray-400 text-sm text-gray-800 bg-gray-50/80" placeholder="여기에 여쭐 말씀을 적으시옵소서..."></textarea>
-                 <button id="askButton" class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-4 rounded-lg focus:outline-none transition duration-150 ease-in-out disabled:opacity-70 disabled:bg-gray-300 disabled:cursor-not-allowed">
+                 <textarea id="messageInput" rows="1" class="flex-grow w-full" placeholder="여기에 여쭐 말씀을 적으시옵소서..."></textarea>
+                 <button id="askButton">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
@@ -172,10 +107,10 @@
                     {% for entry in guestbook_entries %}
                     <div class="guestbook-entry">
                         <div>
-                            <span class="name">{{ entry.name | e }}</span> <!-- Jinja2 escape filter -->
+                            <span class="name">{{ entry.name | e }}</span>
                             <span class="timestamp">{{ entry.timestamp }}</span>
                         </div>
-                        <div class="message">{{ entry.message | e | replace('\n', '<br>') | safe }}</div> <!-- Jinja2 escape, then allow <br> -->
+                        <div class="message">{{ entry.message | e | replace('\n', '<br>') | safe }}</div>
                     </div>
                     {% endfor %}
                 {% else %}
@@ -199,85 +134,73 @@
             </h3>
             <textarea id="notepadTextarea" class="w-full h-full bg-transparent focus:outline-none focus:ring-0 p-1 flex-grow" placeholder="여기에 간단한 기록을 남기시옵소서... (저장 X)"></textarea>
         </div>
-
     </div>
 
     <script>
-        // --- Chatbot DOM Elements & Variables ---
+        // --- DOM Elements ---
         const chatArea = document.getElementById('chatArea');
         const messageInput = document.getElementById('messageInput');
         const askButton = document.getElementById('askButton');
         const thinkingIndicator = document.getElementById('thinkingIndicator');
         const timerElement = document.getElementById('timer');
         const errorArea = document.getElementById('errorArea');
-        let conversationHistory = [];
-        const MAX_HISTORY_MESSAGES = 20; // 대화 기록 유지 개수
-        let timerInterval = null;
-        let startTime = null;
-
-        // --- Guestbook DOM Elements ---
         const guestbookEntriesDiv = document.getElementById('guestbookEntries');
         const guestbookNameInput = document.getElementById('guestbookName');
         const guestbookMessageInput = document.getElementById('guestbookMessage');
         const addEntryButton = document.getElementById('addEntryButton');
         const guestbookErrorDiv = document.getElementById('guestbookError');
 
-        // --- Chatbot Helper: Append Message to UI ---
+        // --- State ---
+        let conversationHistory = [];
+        const MAX_HISTORY_MESSAGES = 20;
+        let timerInterval = null;
+        let startTime = null;
+
+        // --- Chatbot Helper: Append Message ---
         function appendMessageToUI(role, content) {
             const messageDiv = document.createElement('div');
-
-            // Basic Markdown-like rendering (Bold, Italic, Code)
             content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
             content = content.replace(/```(\w+)?\n([\s\S]*?)\n```/g, (match, lang, code) => {
                 const languageClass = lang ? ` class="language-${lang}"` : '';
+                // Corrected escaping for code blocks
                 const escapedCode = code.replace(/</g, '<').replace(/>/g, '>');
                 return `<pre><code${languageClass}>${escapedCode.trim()}</code></pre>`;
             });
-            content = content.replace(/`([^`]+)`/g, '<code>$1</code>'); // Inline code
-
-            // Render newlines as <br>, but not inside <pre> or <code>
+            content = content.replace(/`([^`]+)`/g, '<code>$1</code>');
             if (!content.includes('<pre') && !content.includes('<code')) {
                 content = content.replace(/\n/g, '<br>');
             }
-
-            messageDiv.innerHTML = content; // Use innerHTML for formatted content
+            messageDiv.innerHTML = content;
             messageDiv.classList.add('message-bubble');
-
             if (role === 'user') {
                 messageDiv.classList.add('user-message');
-            } else { // assistant or error
+            } else {
                 messageDiv.classList.add('assistant-message');
-                if (content.includes('⚠️') || content.includes('송구하오나')) { // Style errors/apologies
-                     messageDiv.style.backgroundColor = '#fee2e2'; // Lighter red
-                     messageDiv.style.color = '#b91c1c'; // Darker red
+                if (content.includes('⚠️') || content.includes('송구하오나')) {
+                     messageDiv.style.backgroundColor = '#fee2e2';
+                     messageDiv.style.color = '#b91c1c';
                      messageDiv.style.border = '1px solid #fecaca';
                 }
             }
-
             chatArea.appendChild(messageDiv);
-            chatArea.scrollTop = chatArea.scrollHeight; // Scroll to bottom
+            chatArea.scrollTop = chatArea.scrollHeight;
         }
 
-        // --- Chatbot Helper: Auto-resize Textarea ---
+        // --- Chatbot Helper: Resize Textarea ---
         function autoResizeTextarea() {
             messageInput.style.height = 'auto';
-            const maxHeight = 120; // Max height in pixels
+            const maxHeight = 120;
             messageInput.style.height = `${Math.min(messageInput.scrollHeight, maxHeight)}px`;
         }
 
-        // --- Chatbot Core: Send Message Logic ---
+        // --- Chatbot Core: Send Message ---
         async function sendMessage() {
             const messageText = messageInput.value.trim();
-
             errorArea.textContent = '';
             thinkingIndicator.style.display = 'none';
             if (timerInterval) clearInterval(timerInterval);
-
-            if (!messageText) {
-                messageInput.focus();
-                return;
-            }
+            if (!messageText) { messageInput.focus(); return; }
 
             conversationHistory.push({ role: 'user', content: messageText });
             appendMessageToUI('user', messageText);
@@ -290,11 +213,10 @@
 
             askButton.disabled = true;
             messageInput.disabled = true;
-            askButton.querySelector('svg')?.classList.add('animate-spin'); // Add null check
+            askButton.querySelector('svg')?.classList.add('animate-spin');
             thinkingIndicator.style.display = 'block';
             startTime = Date.now();
             timerElement.textContent = '(0.0s)';
-
             timerInterval = setInterval(() => {
                 const elapsedSeconds = ((Date.now() - startTime) / 1000).toFixed(1);
                 timerElement.textContent = `(${elapsedSeconds}s)`;
@@ -306,41 +228,29 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ history: conversationHistory }),
                 });
-
                 clearInterval(timerInterval); timerInterval = null;
-
                 let data;
-                try {
-                    data = await response.json();
-                } catch (jsonError) {
+                try { data = await response.json(); }
+                catch (jsonError) {
                     console.error('JSON 파싱 오류:', jsonError);
                     const rawText = await response.text(); console.error('Raw server response:', rawText);
                     throw new Error(`서버 응답 형식 오류 (${response.status})`);
                 }
-
-                if (!response.ok) {
-                    // Display backend error message directly
-                    throw new Error(data.error || `서버 오류 (${response.status})`);
-                }
-
+                if (!response.ok) { throw new Error(data.error || `서버 오류 (${response.status})`); }
                 if (data && data.answer) {
                     conversationHistory.push({ role: 'assistant', content: data.answer });
                     appendMessageToUI('assistant', data.answer);
-                } else {
-                    appendMessageToUI('assistant', '⚠️ 답변을 받지 못하였사옵니다.');
-                }
-
+                } else { appendMessageToUI('assistant', '⚠️ 답변을 받지 못하였사옵니다.'); }
             } catch (error) {
                 if (timerInterval) clearInterval(timerInterval);
                 console.error('오류 발생:', error);
-                // Use error message from backend or a generic one
                 const errorMsg = `⚠️ ${error.message || '알 수 없는 오류 발생'}`;
-                appendMessageToUI('assistant', errorMsg); // Display error in chat
-                errorArea.textContent = error.message || '알 수 없는 오류가 발생했습니다.'; // Display in error area
+                appendMessageToUI('assistant', errorMsg);
+                errorArea.textContent = error.message || '알 수 없는 오류가 발생했습니다.';
             } finally {
                 askButton.disabled = false;
                 messageInput.disabled = false;
-                askButton.querySelector('svg')?.classList.remove('animate-spin'); // Add null check
+                askButton.querySelector('svg')?.classList.remove('animate-spin');
                 thinkingIndicator.style.display = 'none';
                 messageInput.focus();
             }
@@ -353,17 +263,13 @@
                 guestbookEntriesDiv.innerHTML = '<p class="text-center text-gray-500 py-4">아직 남겨진 글이 없사옵니다.</p>';
                 return;
             }
-
-            // No need to reverse if backend already reverses
             entries.forEach(entry => {
                 const entryDiv = document.createElement('div');
                 entryDiv.classList.add('guestbook-entry');
-
-                // *** CORRECTED SANITIZATION ***
+                // *** CORRECTED SANITIZATION in JS ***
                 const safeName = entry.name.replace(/</g, "<").replace(/>/g, ">");
                 const safeMessage = entry.message.replace(/</g, "<").replace(/>/g, ">");
-                const safeTimestamp = entry.timestamp;
-
+                const safeTimestamp = entry.timestamp; // Assuming timestamp is safe from backend
                 entryDiv.innerHTML = `
                     <div>
                         <span class="name">${safeName}</span>
@@ -373,16 +279,14 @@
                 `;
                 guestbookEntriesDiv.appendChild(entryDiv);
             });
-            guestbookEntriesDiv.scrollTop = 0; // Scroll to top
+            guestbookEntriesDiv.scrollTop = 0;
         }
 
         // --- Guestbook Core: Fetch and Display ---
         async function fetchAndDisplayGuestbook() {
             try {
                 const response = await fetch('/guestbook');
-                if (!response.ok) {
-                    throw new Error(`방명록 로딩 실패 (${response.status})`);
-                }
+                if (!response.ok) { throw new Error(`방명록 로딩 실패 (${response.status})`); }
                 const entries = await response.json();
                 displayGuestbookEntries(entries);
             } catch (error) {
@@ -396,39 +300,23 @@
             const name = guestbookNameInput.value.trim();
             const message = guestbookMessageInput.value.trim();
             guestbookErrorDiv.textContent = '';
-
-            if (!name || !message) {
-                guestbookErrorDiv.textContent = '성함과 말씀을 모두 적어주시옵소서.';
-                return;
-            }
-            if (name.length > 20 || message.length > 500) {
-                 guestbookErrorDiv.textContent = '길이 제한을 확인해주시옵소서.'; // More specific error? Backend handles it too.
-                 return;
-            }
+            if (!name || !message) { guestbookErrorDiv.textContent = '성함과 말씀을 모두 적어주시옵소서.'; return; }
+            if (name.length > 20 || message.length > 500) { guestbookErrorDiv.textContent = '길이 제한을 확인해주시옵소서.'; return; }
 
             addEntryButton.disabled = true;
             guestbookNameInput.disabled = true;
             guestbookMessageInput.disabled = true;
-
             try {
                 const response = await fetch('/guestbook', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: name, message: message }),
                 });
-
                 const data = await response.json();
-
-                if (!response.ok) {
-                    // Use error message from backend
-                    throw new Error(data.error || `등록 실패 (${response.status})`);
-                }
-
-                // Success
+                if (!response.ok) { throw new Error(data.error || `등록 실패 (${response.status})`); }
                 guestbookNameInput.value = '';
                 guestbookMessageInput.value = '';
                 await fetchAndDisplayGuestbook(); // Refresh list
-
             } catch (error) {
                 console.error("방명록 등록 오류:", error);
                 guestbookErrorDiv.textContent = error.message || "방명록 등록 중 오류 발생";
@@ -443,20 +331,14 @@
         askButton.addEventListener('click', sendMessage);
         messageInput.addEventListener('input', autoResizeTextarea);
         messageInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault(); sendMessage();
-            }
+            if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }
         });
         addEntryButton.addEventListener('click', addGuestbookEntry);
 
         // --- Initial Setup ---
         messageInput.focus();
         autoResizeTextarea();
-        // Initial guestbook load is handled by server-side rendering (Jinja2)
-
-        // Add Jinja2 escaping in the HTML for initial load safety
-        // Example: {{ entry.name | e }}
-        // Example: {{ entry.message | e | replace('\n', '<br>') | safe }}
+        // Initial guestbook load handled by server-side rendering (Jinja2)
 
     </script>
 </body>
