@@ -22,7 +22,7 @@ try:
     if not api_key:
         raise ValueError("환경 변수에서 GEMINI_API_KEY를 찾을 수 없습니다.")
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash-latest')
+    model = genai.GenerativeModel('gemini-2.5-flash-preview-04-17')
     app.logger.info("Gemini 모델이 성공적으로 로드되었습니다.")
 except Exception as e:
     app.logger.error(f"Gemini API 설정 중 오류 발생: {e}")
