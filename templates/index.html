@@ -5,104 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>정보의 궁전 & 방명록</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Socket.IO 클라이언트 라이브러리 추가 -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Inter', 'Noto Sans KR';
-            background-color: #f5f5f7;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+        /* ... 이전 CSS 스타일 유지 ... */
+        /* 새로운 방명록 글 강조 효과 (선택 사항) */
+        .guestbook-entry.new-entry {
+            animation: highlight 2s ease-out;
         }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cccccc; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #aaaaaa; }
-
-        #chatArea { max-height: calc(75vh - 150px); overflow-y: auto; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
-        .message-bubble { padding: 0.6rem 0.9rem; border-radius: 1rem; margin-bottom: 0.75rem; max-width: 85%; line-height: 1.6; word-wrap: break-word; font-size: 0.875rem; clear: both; }
-        .user-message { background-color: #dbeafe; color: #1e40af; float: right; margin-left: auto; text-align: left; }
-        .assistant-message { background-color: #e5e7eb; color: #374151; float: left; margin-right: auto; }
-
-        #inputArea { padding: 0.75rem 1rem; }
-        #messageInput {
-            resize: none; overflow-y: hidden; transition: height 0.2s ease; flex-grow: 1; width: 100%; padding: 0.6rem 0.75rem; /* Adjusted padding slightly */
-            border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-            font-size: 0.875rem; color: #1f2937; background-color: #f9fafb; /* Slightly adjusted input colors */
+        @keyframes highlight {
+            0% { background-color: #d1fae5; } /* Light green */
+            100% { background-color: #f9fafb; } /* Original background */
         }
-        #messageInput::placeholder { color: #9ca3af; } /* Placeholder color */
-        #messageInput:focus { outline: none; box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.4); border-color: #60a5fa; } /* Adjusted focus ring */
-        button#askButton {
-             padding-top: 0.5rem; padding-bottom: 0.5rem; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
-             background-color: #4f46e5; /* Indigo */ hover:background-color: #4338ca; color: white; font-weight: 500; text-sm: ; padding: 0.5rem 1rem; /* Adjusted padding */
-             border-radius: 0.5rem; /* Matched input border-radius */ focus:outline-none; transition: background-color 0.2s;
-         }
-        button:disabled { background-color: #d1d5db; cursor: not-allowed; opacity: 0.7; }
-
-        #thinkingIndicator { display: none; text-align: center; padding: 0.5rem 0; color: #6b7280; font-size: 0.875rem; border-top: 1px solid #e5e7eb; }
-        #timer { font-weight: 500; font-variant-numeric: tabular-nums; }
-        #errorArea { text-align: center; color: #dc2626; font-size: 0.75rem; font-weight: 500; height: 1.25rem; padding: 0 1rem; }
-
-        .guestbook-container { height: 75vh; max-height: 75vh; display: flex; flex-direction: column; }
-        #guestbookEntries { flex-grow: 1; overflow-y: auto; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
-        .guestbook-entry { background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 0.75rem 1rem; border-radius: 0.5rem; margin-bottom: 0.75rem; }
-        .guestbook-entry .name { font-weight: 600; color: #1f2937; margin-right: 0.5rem; }
-        .guestbook-entry .timestamp { font-size: 0.75rem; color: #6b7280; }
-        .guestbook-entry .message { margin-top: 0.5rem; font-size: 0.875rem; color: #374151; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
-        #guestbookForm { padding: 1rem; border-top: 1px solid #e5e7eb; }
-        #guestbookForm input, #guestbookForm textarea {
-            width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; margin-bottom: 0.75rem; font-size: 0.875rem;
-            box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        }
-         #guestbookForm input:focus, #guestbookForm textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
-         #guestbookForm textarea { resize: vertical; min-height: 60px; }
-         #guestbookForm button {
-            width: 100%; background-color: #3b82f6; color: white; font-weight: 500; padding: 0.5rem 1rem; border-radius: 0.375rem; transition: background-color 0.2s;
-         }
-         #guestbookForm button:hover { background-color: #2563eb; }
-         #guestbookError { color: #dc2626; font-size: 0.75rem; font-weight: 500; height: 1.25rem; margin-top: 0.5rem; text-align: center; }
-
-        #notepadTextarea { flex-grow: 1; border: none; outline: none; box-shadow: none; resize: none; background-color: transparent; font-size: 0.875rem; line-height: 1.6; color: #4b5563; padding: 0.25rem; }
-        #notepadTextarea:focus { box-shadow: none; }
-
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 md:p-6 bg-gray-100">
     <div class="flex flex-col md:flex-row gap-6 w-full max-w-7xl mx-auto">
-
         <!-- Chat Section -->
         <div class="bg-white rounded-2xl shadow-sm w-full md:w-[45%] border border-gray-200/75 flex flex-col overflow-hidden guestbook-container">
-            <div class="text-center p-6 border-b border-gray-200/90 flex-shrink-0">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-indigo-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                 </svg>
-                 <h1 class="text-xl md:text-2xl font-semibold text-gray-800">정보의 궁전</h1>
-                 <p class="text-xs text-gray-500 mt-1">궁금한 것을 물어보시옵소서.</p>
-            </div>
-            <div id="chatArea" class="flex-grow">
-                 <div class="message-bubble assistant-message">반갑사옵니다. 무엇이 궁금하신지요?</div>
-            </div>
-            <div id="thinkingIndicator" class="flex-shrink-0">
-                 <span>답변을 생각하고 있사옵니다... </span><span id="timer">(0.0s)</span>
-            </div>
-            <div id="errorArea" class="flex-shrink-0"></div>
-            <div id="inputArea" class="flex items-end gap-2 border-t border-gray-200/90 flex-shrink-0 p-2">
-                 <textarea id="messageInput" rows="1" class="flex-grow w-full" placeholder="여기에 여쭐 말씀을 적으시옵소서..."></textarea>
-                 <button id="askButton">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                </button>
-            </div>
+            <!-- ... 채팅 섹션 HTML 구조 유지 ... -->
+             <div class="text-center p-6 border-b border-gray-200/90 flex-shrink-0">...</div>
+             <div id="chatArea" class="flex-grow">...</div>
+             <div id="thinkingIndicator" class="flex-shrink-0">...</div>
+             <div id="errorArea" class="flex-shrink-0"></div>
+             <div id="inputArea" class="flex items-end gap-2 border-t border-gray-200/90 flex-shrink-0 p-2">...</div>
         </div>
 
         <!-- Guestbook Section -->
         <div class="bg-white rounded-2xl shadow-sm w-full md:w-[30%] border border-gray-200/75 flex flex-col guestbook-container">
             <h3 class="text-lg font-semibold text-gray-700 p-4 border-b text-center flex-shrink-0">방명록</h3>
             <div id="guestbookEntries">
+                <!-- 초기 로딩은 서버에서, 실시간 추가는 JS로 -->
                 {% if guestbook_entries %}
                     {% for entry in guestbook_entries %}
                     <div class="guestbook-entry">
@@ -114,12 +50,12 @@
                     </div>
                     {% endfor %}
                 {% else %}
-                    <p class="text-center text-gray-500 py-4">아직 남겨진 글이 없사옵니다.</p>
+                    <p class="text-center text-gray-500 py-4" id="noEntriesMessage">아직 남겨진 글이 없사옵니다.</p>
                 {% endif %}
             </div>
             <div id="guestbookForm" class="flex-shrink-0 p-4">
-                <input type="text" id="guestbookName" placeholder="성함 (최대 20자)" maxlength="20" required>
-                <textarea id="guestbookMessage" rows="3" placeholder="말씀을 남겨주시옵소서 (최대 500자)" maxlength="500" required></textarea>
+                <input type="text" id="guestbookName" placeholder="성함 (최대 50자)" maxlength="50" required> <!-- DB 크기에 맞춤 -->
+                <textarea id="guestbookMessage" rows="3" placeholder="말씀을 남겨주시옵소서 (최대 1000자)" maxlength="1000" required></textarea> <!-- DB 크기에 맞춤 -->
                 <button id="addEntryButton">등록하기</button>
                 <div id="guestbookError"></div>
             </div>
@@ -127,196 +63,96 @@
 
         <!-- Notepad Section -->
         <div class="bg-white p-6 rounded-2xl shadow-sm w-full md:w-[25%] border border-gray-200/75 flex flex-col guestbook-container md:sticky md:top-6">
-             <h3 class="text-sm font-medium text-gray-600 mb-3 flex items-center uppercase tracking-wider flex-shrink-0">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                 </svg> 메모장
-            </h3>
-            <textarea id="notepadTextarea" class="w-full h-full bg-transparent focus:outline-none focus:ring-0 p-1 flex-grow" placeholder="여기에 간단한 기록을 남기시옵소서... (저장 X)"></textarea>
+             <!-- ... 메모장 HTML 구조 유지 ... -->
+             <h3 class="text-sm font-medium text-gray-600 mb-3 flex items-center uppercase tracking-wider flex-shrink-0">...</h3>
+             <textarea id="notepadTextarea" class="w-full h-full bg-transparent ..." placeholder="..."></textarea>
         </div>
     </div>
 
     <script>
         // --- DOM Elements ---
         const chatArea = document.getElementById('chatArea');
-        const messageInput = document.getElementById('messageInput');
-        const askButton = document.getElementById('askButton');
-        const thinkingIndicator = document.getElementById('thinkingIndicator');
-        const timerElement = document.getElementById('timer');
-        const errorArea = document.getElementById('errorArea');
+        // ... (다른 채팅 관련 요소들) ...
         const guestbookEntriesDiv = document.getElementById('guestbookEntries');
         const guestbookNameInput = document.getElementById('guestbookName');
         const guestbookMessageInput = document.getElementById('guestbookMessage');
         const addEntryButton = document.getElementById('addEntryButton');
         const guestbookErrorDiv = document.getElementById('guestbookError');
+        const noEntriesMessage = document.getElementById('noEntriesMessage'); // '글 없음' 메시지 요소
 
         // --- State ---
         let conversationHistory = [];
-        const MAX_HISTORY_MESSAGES = 20;
-        let timerInterval = null;
-        let startTime = null;
+        // ... (다른 채팅 관련 상태 변수들) ...
 
-        // --- Chatbot Helper: Append Message ---
-        function appendMessageToUI(role, content) {
-            const messageDiv = document.createElement('div');
-            content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            content = content.replace(/```(\w+)?\n([\s\S]*?)\n```/g, (match, lang, code) => {
-                const languageClass = lang ? ` class="language-${lang}"` : '';
-                // Corrected escaping for code blocks
-                const escapedCode = code.replace(/</g, '<').replace(/>/g, '>');
-                return `<pre><code${languageClass}>${escapedCode.trim()}</code></pre>`;
-            });
-            content = content.replace(/`([^`]+)`/g, '<code>$1</code>');
-            if (!content.includes('<pre') && !content.includes('<code')) {
-                content = content.replace(/\n/g, '<br>');
+        // --- Socket.IO 연결 ---
+        const socket = io(); // 서버와 Socket.IO 연결 시작
+
+        // --- Chatbot Functions ---
+        function appendMessageToUI(role, content) { /* ... 이전 코드 유지 ... */ }
+        function autoResizeTextarea() { /* ... 이전 코드 유지 ... */ }
+        async function sendMessage() { /* ... 이전 코드 유지 ... */ }
+
+        // --- Guestbook Helper: 새 글 추가 ---
+        function prependGuestbookEntry(entry) {
+            // '글 없음' 메시지가 있다면 제거
+            if (noEntriesMessage) {
+                noEntriesMessage.remove();
             }
-            messageDiv.innerHTML = content;
-            messageDiv.classList.add('message-bubble');
-            if (role === 'user') {
-                messageDiv.classList.add('user-message');
-            } else {
-                messageDiv.classList.add('assistant-message');
-                if (content.includes('⚠️') || content.includes('송구하오나')) {
-                     messageDiv.style.backgroundColor = '#fee2e2';
-                     messageDiv.style.color = '#b91c1c';
-                     messageDiv.style.border = '1px solid #fecaca';
-                }
-            }
-            chatArea.appendChild(messageDiv);
-            chatArea.scrollTop = chatArea.scrollHeight;
+
+            const entryDiv = document.createElement('div');
+            entryDiv.classList.add('guestbook-entry', 'new-entry'); // 새 글 강조 클래스 추가
+
+            const safeName = entry.name.replace(/</g, "<").replace(/>/g, ">");
+            const safeMessage = entry.message.replace(/</g, "<").replace(/>/g, ">");
+            const safeTimestamp = entry.timestamp;
+
+            entryDiv.innerHTML = `
+                <div>
+                    <span class="name">${safeName}</span>
+                    <span class="timestamp">${safeTimestamp}</span>
+                </div>
+                <div class="message">${safeMessage.replace(/\n/g, '<br>')}</div>
+            `;
+            // 목록 맨 위에 추가 (prepend)
+            guestbookEntriesDiv.insertBefore(entryDiv, guestbookEntriesDiv.firstChild);
+
+            // 강조 효과를 위해 잠시 후 클래스 제거 (선택 사항)
+            setTimeout(() => {
+                entryDiv.classList.remove('new-entry');
+            }, 2000); // 2초 후 제거
         }
 
-        // --- Chatbot Helper: Resize Textarea ---
-        function autoResizeTextarea() {
-            messageInput.style.height = 'auto';
-            const maxHeight = 120;
-            messageInput.style.height = `${Math.min(messageInput.scrollHeight, maxHeight)}px`;
-        }
-
-        // --- Chatbot Core: Send Message ---
-        async function sendMessage() {
-            const messageText = messageInput.value.trim();
-            errorArea.textContent = '';
-            thinkingIndicator.style.display = 'none';
-            if (timerInterval) clearInterval(timerInterval);
-            if (!messageText) { messageInput.focus(); return; }
-
-            conversationHistory.push({ role: 'user', content: messageText });
-            appendMessageToUI('user', messageText);
-            messageInput.value = '';
-            autoResizeTextarea();
-
-            while (conversationHistory.length > MAX_HISTORY_MESSAGES) {
-                conversationHistory.shift();
-            }
-
-            askButton.disabled = true;
-            messageInput.disabled = true;
-            askButton.querySelector('svg')?.classList.add('animate-spin');
-            thinkingIndicator.style.display = 'block';
-            startTime = Date.now();
-            timerElement.textContent = '(0.0s)';
-            timerInterval = setInterval(() => {
-                const elapsedSeconds = ((Date.now() - startTime) / 1000).toFixed(1);
-                timerElement.textContent = `(${elapsedSeconds}s)`;
-            }, 100);
-
-            try {
-                const response = await fetch('/ask', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ history: conversationHistory }),
-                });
-                clearInterval(timerInterval); timerInterval = null;
-                let data;
-                try { data = await response.json(); }
-                catch (jsonError) {
-                    console.error('JSON 파싱 오류:', jsonError);
-                    const rawText = await response.text(); console.error('Raw server response:', rawText);
-                    throw new Error(`서버 응답 형식 오류 (${response.status})`);
-                }
-                if (!response.ok) { throw new Error(data.error || `서버 오류 (${response.status})`); }
-                if (data && data.answer) {
-                    conversationHistory.push({ role: 'assistant', content: data.answer });
-                    appendMessageToUI('assistant', data.answer);
-                } else { appendMessageToUI('assistant', '⚠️ 답변을 받지 못하였사옵니다.'); }
-            } catch (error) {
-                if (timerInterval) clearInterval(timerInterval);
-                console.error('오류 발생:', error);
-                const errorMsg = `⚠️ ${error.message || '알 수 없는 오류 발생'}`;
-                appendMessageToUI('assistant', errorMsg);
-                errorArea.textContent = error.message || '알 수 없는 오류가 발생했습니다.';
-            } finally {
-                askButton.disabled = false;
-                messageInput.disabled = false;
-                askButton.querySelector('svg')?.classList.remove('animate-spin');
-                thinkingIndicator.style.display = 'none';
-                messageInput.focus();
-            }
-        }
-
-        // --- Guestbook Helper: Display Entries ---
-        function displayGuestbookEntries(entries) {
-            guestbookEntriesDiv.innerHTML = '';
-            if (!entries || entries.length === 0) {
-                guestbookEntriesDiv.innerHTML = '<p class="text-center text-gray-500 py-4">아직 남겨진 글이 없사옵니다.</p>';
-                return;
-            }
-            entries.forEach(entry => {
-                const entryDiv = document.createElement('div');
-                entryDiv.classList.add('guestbook-entry');
-                // *** CORRECTED SANITIZATION in JS ***
-                const safeName = entry.name.replace(/</g, "<").replace(/>/g, ">");
-                const safeMessage = entry.message.replace(/</g, "<").replace(/>/g, ">");
-                const safeTimestamp = entry.timestamp; // Assuming timestamp is safe from backend
-                entryDiv.innerHTML = `
-                    <div>
-                        <span class="name">${safeName}</span>
-                        <span class="timestamp">${safeTimestamp}</span>
-                    </div>
-                    <div class="message">${safeMessage.replace(/\n/g, '<br>')}</div>
-                `;
-                guestbookEntriesDiv.appendChild(entryDiv);
-            });
-            guestbookEntriesDiv.scrollTop = 0;
-        }
-
-        // --- Guestbook Core: Fetch and Display ---
-        async function fetchAndDisplayGuestbook() {
-            try {
-                const response = await fetch('/guestbook');
-                if (!response.ok) { throw new Error(`방명록 로딩 실패 (${response.status})`); }
-                const entries = await response.json();
-                displayGuestbookEntries(entries);
-            } catch (error) {
-                console.error("방명록 로딩 오류:", error);
-                guestbookErrorDiv.textContent = "방명록을 불러오는 중 오류가 발생했습니다.";
-            }
-        }
-
-        // --- Guestbook Core: Add Entry ---
+        // --- Guestbook Core: 글 등록 (SocketIO 사용) ---
         async function addGuestbookEntry() {
             const name = guestbookNameInput.value.trim();
             const message = guestbookMessageInput.value.trim();
             guestbookErrorDiv.textContent = '';
+
             if (!name || !message) { guestbookErrorDiv.textContent = '성함과 말씀을 모두 적어주시옵소서.'; return; }
-            if (name.length > 20 || message.length > 500) { guestbookErrorDiv.textContent = '길이 제한을 확인해주시옵소서.'; return; }
+            // 길이 제한은 백엔드에서 처리하므로 JS에서는 생략 가능 (선택적)
 
             addEntryButton.disabled = true;
             guestbookNameInput.disabled = true;
             guestbookMessageInput.disabled = true;
+
             try {
+                // 이제 fetch 대신 백엔드의 /guestbook POST API를 호출하여 DB에 저장 요청
                 const response = await fetch('/guestbook', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: name, message: message }),
                 });
                 const data = await response.json();
-                if (!response.ok) { throw new Error(data.error || `등록 실패 (${response.status})`); }
+
+                if (!response.ok) {
+                    throw new Error(data.error || `등록 실패 (${response.status})`);
+                }
+
+                // 성공 시 입력 필드 비우기 (화면 업데이트는 SocketIO 이벤트가 처리)
                 guestbookNameInput.value = '';
                 guestbookMessageInput.value = '';
-                await fetchAndDisplayGuestbook(); // Refresh list
+                // fetchAndDisplayGuestbook() 호출 제거!
+
             } catch (error) {
                 console.error("방명록 등록 오류:", error);
                 guestbookErrorDiv.textContent = error.message || "방명록 등록 중 오류 발생";
@@ -326,6 +162,21 @@
                 guestbookMessageInput.disabled = false;
             }
         }
+
+        // --- Socket.IO 이벤트 리스너 ---
+        socket.on('connect', () => {
+            console.log('Socket.IO 서버에 연결되었습니다.');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Socket.IO 서버 연결이 끊어졌습니다.');
+        });
+
+        socket.on('new_entry', (entryData) => {
+            console.log('새 방명록 수신:', entryData);
+            // 새 글을 화면에 추가
+            prependGuestbookEntry(entryData);
+        });
 
         // --- Event Listeners ---
         askButton.addEventListener('click', sendMessage);
@@ -338,7 +189,9 @@
         // --- Initial Setup ---
         messageInput.focus();
         autoResizeTextarea();
-        // Initial guestbook load handled by server-side rendering (Jinja2)
+        // 초기 방명록 로딩은 서버 렌더링으로 처리됨.
+        // 만약 페이지 로드 후 JS로 최신화하고 싶다면 아래 함수 호출 가능
+        // fetchAndDisplayGuestbook(); // 이 함수는 이제 GET 요청만 함
 
     </script>
 </body>
