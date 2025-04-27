@@ -1,7 +1,7 @@
-Flask
-google-generativeai
+Flask>=2.0.0 # 예시 버전, 필요시 조정
+Flask-SocketIO>=5.0.0 # 예시 버전
+eventlet>=0.30.0 # 예시 버전
+gunicorn>=20.0.0 # 예시 버전
+psycopg2-binary # 버전 명시 안 함 (보통 최신이 괜찮음)
 pytz
-gunicorn
-Flask-SocketIO
-eventlet
-psycopg2-binary
+google-generativeai
